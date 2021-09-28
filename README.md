@@ -142,6 +142,23 @@ auto-summary
 exit-address-family
 ```
 
+
+Note: Trong trường hợp 1 peer với cả 1 dải mạng, tạo peer-group với listen range dải mạng cần peer.
+```
+router bgp 65000
+ bgp log-neighbor-changes
+ bgp listen range 192.168.1.0/24 peer-group group-1
+ neighbor group-1 peer-group
+ neighbor group-1 remote-as 65001
+ !        
+ address-family ipv4
+  network 192.168.1.2
+  neighbor group-1 activate
+  maximum-paths 4
+  auto-summary
+ exit-address-family
+```
+
 ## Kết quả 
 
 ### Ping
