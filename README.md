@@ -23,7 +23,7 @@
 
 2. Sử dụng quagga và zebra để cấu hình bgp để pair với L3 switch
 
-    **/etc/quagga/bgpd.conf**
+    **Server 1 /etc/quagga/bgpd.conf**
 
     ```
     !
@@ -47,7 +47,7 @@
     !
     ```
 
-    **/etc/quagga/zebra.conf**
+    **Server 1/etc/quagga/zebra.conf**
     
     ```
     !
@@ -72,7 +72,55 @@
     !
     ```
 
-Cấu hình tương tự với server còn lại, thay source IP
+
+    **Server 2 /etc/quagga/bgpd.conf**
+
+    ```
+    !
+    ! Zebra configuration saved from vty
+    !   2021/09/27 08:12:16
+    !
+    !
+    router bgp 65001                                # AS của server
+    bgp router-id 192.168.1.6                       # ID server
+    network 10.10.10.0/24                           # network quảng bá qua bgp (ip anycast)
+    neighbor 192.168.1.2 remote-as 65000            # neighbor 
+    neighbor 192.168.1.2 interface ens3
+    !
+    address-family ipv6
+    exit-address-family
+    exit
+    !
+    route-map RM_SET_SRC permit 10
+    !
+    line vty
+    !
+    ```
+
+    **Server 2 /etc/quagga/zebra.conf**
+    
+    ```
+    !
+    ! Zebra configuration saved from vty
+    !   2021/09/27 08:12:16
+    !
+    !
+    interface ens3
+    !
+    interface ens4
+    !
+    interface lo
+    !
+    route-map RM_SET_SRC permit 10
+    set src 192.168.1.6
+    !
+    router-id 192.168.1.6
+    !
+    ip protocol bgp route-map RM_SET_SRC
+    !
+    line vty
+    !
+    ```
 
 ### Cấu hình L3 Switch
 
